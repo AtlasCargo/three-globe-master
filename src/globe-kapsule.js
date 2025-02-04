@@ -356,38 +356,33 @@ export default Kapsule({
     },
     _animationCycle: function(state, time) {
       debugger;
-      console.log('[globe-kapsule] _animationCycle invoked with time:', time);
+      console.log('[globe-kapsule] animationCycle invoked with time:', time);
       // Use performance.now() as a fallback if no timestamp provided.
       const timestamp = time || performance.now();
       
       // Initialize lastUpdateTime if not already set.
       if (!state.lastUpdateTime) state.lastUpdateTime = timestamp;
       
+      // Log the current fpsLimit value from state
+      console.log('[globe-kapsule] state.fpsLimit:', state.fpsLimit);
+      
       // Calculate the time elapsed since the last frame update.
       const elapsed = timestamp - state.lastUpdateTime;
+      
       // Determine the minimum interval between updates (in milliseconds)
       // using the fpsLimit property; if fpsLimit is undefined, default to 60fps.
       const minInterval = 1000 / (state.fpsLimit || 60);
       
-      // DEBUG: Log when we're skipping frame update due to throttling.
       if (elapsed < minInterval) {
-        console.log('[globe-kapsule] Skipping frame update. Elapsed:', elapsed, 'minInterval:', minInterval);
-        // Schedule the next frame update and exit early.
-        state.animationFrameRequestId = requestAnimationFrame(t => this._animationCycle(state, t));
+        console.log('[globe-kapsule] Skipping update. Elapsed:', elapsed, 'minInterval:', minInterval);
+        state.animationFrameRequestId = requestAnimationFrame(this._animationCycle.bind(this, state));
         return;
+      } else {
+        console.log('[globe-kapsule] Proceeding with update. Elapsed:', elapsed, 'minInterval:', minInterval);
+        state.lastUpdateTime = timestamp;
+        state.tweenGroup.update();
+        state.animationFrameRequestId = requestAnimationFrame(this._animationCycle.bind(this, state));
       }
-      
-      // DEBUG: Log when we're updating the frame.
-      console.log('[globe-kapsule] Updating frame. Elapsed:', elapsed, 'minInterval:', minInterval);
-      
-      // Update the last update time to the current timestamp.
-      state.lastUpdateTime = timestamp;
-      
-      // Run tween updates for animations. This call typically updates any ongoing animations.
-      state.tweenGroup.update();
-      
-      // Schedule the next animation frame.
-      state.animationFrameRequestId = requestAnimationFrame(t => this._animationCycle(state, t));
     },
     _destructor: function(state) {
       this.pauseAnimation();
