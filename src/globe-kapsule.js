@@ -355,6 +355,8 @@ export default Kapsule({
       return this;
     },
     _animationCycle: function(state, time) {
+      debugger;
+      console.log('[globe-kapsule] _animationCycle invoked with time:', time);
       // Use performance.now() as a fallback if no timestamp provided.
       const timestamp = time || performance.now();
       
