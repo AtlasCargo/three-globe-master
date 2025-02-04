@@ -349,19 +349,18 @@ export default Kapsule({
     },
     resumeAnimation: function(state) {
       if (state.animationFrameRequestId === null) {
-        this._animationCycle();
+        this._animationCycle(state, performance.now());
       }
       state.pausableLayers.forEach(l => l.resumeAnimation?.());
       return this;
     },
     _animationCycle: function(state, time) {
-      debugger;
       console.log('[globe-kapsule] animationCycle invoked with time:', time);
-      // Use performance.now() as a fallback if no timestamp provided.
-      const timestamp = time || performance.now();
+      // Ensure the timestamp is a number; otherwise fallback to performance.now()
+      const timestamp = (typeof time === 'number' ? time : performance.now());
       
-      // Initialize lastUpdateTime if not already set.
-      if (!state.lastUpdateTime) state.lastUpdateTime = timestamp;
+      // Initialize lastUpdateTime if not set or not a valid number.
+      if (!state.lastUpdateTime || typeof state.lastUpdateTime !== 'number') state.lastUpdateTime = timestamp;
       
       // Log the current fpsLimit value from state
       console.log('[globe-kapsule] state.fpsLimit:', state.fpsLimit);
