@@ -391,9 +391,8 @@ export default Kapsule({
     ...linkedGlobeLayerMethods
   },
 
-  stateInit: () => {
+  stateInit: function(options) {
     const tweenGroup = new TweenGroup();
-
     const initProps = { tweenGroup };
     const layers = {
       globeLayer: GlobeLayerKapsule(initProps),
@@ -413,9 +412,13 @@ export default Kapsule({
       customLayer: CustomLayerKapsule(initProps)
     };
 
+    // Ensure that state.fpsLimit is properly set from options or use a default value.
+    const fpsLimit = (typeof options.fpsLimit === 'number') ? options.fpsLimit : 60;
+
     return {
       tweenGroup,
       lastUpdateTime: performance.now(),
+      fpsLimit, // Add fpsLimit to the state
       ...layers,
       layersThatNeedUpdatePov: Object.values(layers).filter(l => l.hasOwnProperty('updatePov')),
       layersThatNeedBehindGlobeChecker: Object.values(layers).filter(l => l.hasOwnProperty('isBehindGlobe')),
